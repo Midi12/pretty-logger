@@ -1,0 +1,26 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="../src/pretty-logger.css">
+    <script src="../src/pretty-logger.js"></script>
+</head>
+
+<body>
+    <div id="test">
+        <span>spun</span>
+    </div>
+    <div id="test2">
+    </div>
+    <div id="debugLogPanel">
+    </div>
+    <script>
+        var logger = new PrettyLogger('debugLogPanel');
+        logger.info('This is an info message');
+        logger.error({ name: 'Error Object', message: 'This is an error', details: { code: 500, stack: 'Error stack...' } });
+        logger.error({});
+        logger.error(document.getElementById('test'));
+        logger.error(document.getElementById('test2'));
+    </script>
+</body>
+
+</html>

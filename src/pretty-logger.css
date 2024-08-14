@@ -1,0 +1,107 @@
+.adl-log-entry {
+    font-family: monospace;
+    margin-bottom: 5px;
+}
+
+.adl-timestamp {
+    color: #888;
+}
+
+.adl-level {
+    font-weight: bold;
+}
+
+.adl-message {
+    margin-left: 10px;
+}
+
+.adl-text-error {
+    color: #dc3545;
+}
+
+.adl-text-warn {
+    color: #ffc107;
+}
+
+.adl-text-info {
+    color: #17a2b8;
+}
+
+.adl-text-debug {
+    color: #28a745;
+}
+
+.adl-text-gray {
+    color: #6c757d;
+}
+
+.adl-collapsible {
+    display: none;
+    margin-left: 20px;
+    border-left: 1px dotted #ccc;
+    padding-left: 10px;
+}
+
+.adl-collapsible.adl-expanded {
+    display: block;
+}
+
+.adl-toggle {
+    cursor: pointer;
+    padding-left: 5px;
+}
+
+.adl-toggle::before {
+    content: '▶';
+    display: inline-block;
+    margin-right: 5px;
+    transition: transform 0.3s;
+}
+
+.adl-toggle.adl-expanded::before {
+    transform: rotate(90deg);
+}
+
+.adl-key {
+    color: #0066cc;
+    font-weight: bold;
+}
+
+.adl-value {
+    color: #009933;
+}
+
+.adl-collapsible>div {
+    margin-left: 20px;
+}
+
+.adl-collapsible .adl-toggle {
+    margin-left: -10px;
+}
+
+.adl-key[class*="<"] {
+    color: #800080;
+}
+
+.adl-key[class*="<"] .adl-value {
+    color: #0000FF;
+}
+
+.adl-ellipsis {
+    color: #888;
+    font-style: italic;
+    margin: 0 3px;
+}
+
+.adl-toggle.adl-expanded .adl-ellipsis {
+    display: none;
+}
+
+.adl-key[class*="<"] .adl-ellipsis {
+    margin-left: 3px;
+    margin-right: 0;
+}
+
+.adl-key:not(.adl-toggle) {
+    cursor: default;
+}
