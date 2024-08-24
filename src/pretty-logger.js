@@ -16,19 +16,24 @@
             throw new Error("Debug panel with id '" + debugPanelId + "' not found");
         }
 
-        this.log = function (level, message) {
-            var logEntry = self.createLogEntry(level, message);
+        this.maxLogEntries = 50;
+        this.logEntries = [];
 
-            if (typeof window !== 'undefined') {
-                var logLine = document.createElement('div');
-                logLine.className = 'adl-log-entry';
-                logLine.innerHTML = logEntry;
-                self.debugLogPanel.appendChild(logLine);
-                self.debugLogPanel.scrollTop = self.debugLogPanel.scrollHeight;
-                self.addCollapsibleListeners(logLine);
-            } else {
-                console.log(self.stripHtml(logEntry));
+        this.log = function(level, message) {
+            var logEntry = self.createLogEntry(level, message);
+            
+            self.logEntries.push(logEntry);
+            if (self.logEntries.length > self.maxLogEntries) {
+                self.logEntries.shift(); // Remove the oldest entry
+                self.debugLogPanel.removeChild(self.debugLogPanel.firstChild);
             }
+    
+            var logLine = document.createElement('div');
+            logLine.className = 'adl-log-entry';
+            logLine.innerHTML = logEntry;
+            self.debugLogPanel.appendChild(logLine);
+            self.debugLogPanel.scrollTop = self.debugLogPanel.scrollHeight;
+            self.addCollapsibleListeners(logLine);
         };
 
         this.createLogEntry = function (level, message) {
