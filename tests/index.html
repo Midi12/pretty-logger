@@ -18,6 +18,8 @@
         logger.info('This is an info message');
         logger.error({ name: 'Error Object', message: 'This is an error', details: { code: 500, stack: 'Error stack...' } });
         logger.error({});
+        logger.error([]);
+        logger.error([{a:1, b:2}, {a:5, b:3}]);
         logger.error(document.getElementById('test'));
         logger.error(document.getElementById('test2'));
     </script>

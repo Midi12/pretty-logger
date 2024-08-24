@@ -19,15 +19,15 @@
         this.maxLogEntries = 50;
         this.logEntries = [];
 
-        this.log = function(level, message) {
+        this.log = function (level, message) {
             var logEntry = self.createLogEntry(level, message);
-            
+
             self.logEntries.push(logEntry);
             if (self.logEntries.length > self.maxLogEntries) {
                 self.logEntries.shift(); // Remove the oldest entry
                 self.debugLogPanel.removeChild(self.debugLogPanel.firstChild);
             }
-    
+
             var logLine = document.createElement('div');
             logLine.className = 'adl-log-entry';
             logLine.innerHTML = logEntry;
@@ -39,7 +39,7 @@
         this.createLogEntry = function (level, message) {
             var timestamp = new Date().toISOString().substr(11, 12);
             var textColorClass = self.getColorClassForLevel(level);
-            var formattedMessage = self.formatMessage(message);
+            var formattedMessage = self.formatValue(message, 0);
 
             return '<span class="adl-timestamp">[' + timestamp + ']</span> ' +
                 '<span class="adl-level ' + textColorClass + '">[' + level.toUpperCase() + ']</span> ' +
@@ -58,37 +58,53 @@
             }
         };
 
+        this.formatValue = function (value, depth) {
+            if (value instanceof HTMLElement) {
+                return self.formatHTMLElement(value, depth);
+            } else if (typeof value === 'object' && value !== null) {
+                return self.formatObject(value, depth);
+            } else {
+                return '<span class="adl-value">' + self.escapeHTML(String(value)) + '</span>';
+            }
+        };
+
         this.formatObject = function (obj, depth) {
             depth = depth || 0;
-            if (depth > 5) return '<span class="adl-value">{...}</span>'; // Limit recursion depth
+            if (depth > 5) return '<span class="adl-value">' + (Array.isArray(obj) ? '[...]' : '{...}') + '</span>'; // Limit recursion depth
 
-            var hasChildren = Object.keys(obj).length > 0;
+            var isArray = Array.isArray(obj);
+            var hasChildren = isArray ? obj.length > 0 : Object.keys(obj).length > 0;
+            var openBracket = isArray ? '[' : '{';
+            var closeBracket = isArray ? ']' : '}';
             var ellipsis = hasChildren ? '<span class="adl-ellipsis">...</span>' : '';
 
-            var result = '<span class="adl-toggle adl-key">{' + ellipsis + '</span>';
-            result += '<div class="adl-collapsible">';
+            var result = '<span class="adl-toggle adl-key">' + openBracket + ellipsis + '</span>';
 
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    var value = obj[key];
-                    result += '<div>';
-                    result += '<span class="adl-key">' + self.escapeHTML(key) + '</span>: ';
+            if (hasChildren) {
+                result += '<div class="adl-collapsible">';
 
-                    if (typeof value === 'object' && value !== null) {
-                        result += self.formatObject(value, depth + 1);
-                    } else {
-                        result += '<span class="adl-value">' + self.escapeHTML(String(value)) + '</span>';
+                if (isArray) {
+                    for (var i = 0; i < obj.length; i++) {
+                        result += '<div>';
+                        result += '<span class="adl-key">' + i + '</span>: ';
+                        result += self.formatValue(obj[i], depth + 1);
+                        result += '</div>';
                     }
-                    result += '</div>';
+                } else {
+                    for (var key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            result += '<div>';
+                            result += '<span class="adl-key">' + self.escapeHTML(key) + '</span>: ';
+                            result += self.formatValue(obj[key], depth + 1);
+                            result += '</div>';
+                        }
+                    }
                 }
+
+                result += '</div>';
             }
 
-            result += '</div>';
-            result += '<span class="adl-key">}</span>';
-
-            if (!hasChildren) {
-                result = '<span class="adl-value">{}</span>';
-            }
+            result += '<span class="adl-key">' + closeBracket + '</span>';
 
             return result;
         };
@@ -97,16 +113,14 @@
             depth = depth || 0;
             if (depth > 5) return '<span class="adl-value">...</span>'; // Limit recursion depth
 
-            var hasChildren = false;
+            var hasChildren = element.childNodes.length > 0;
             var childContent = '';
 
             for (var j = 0; j < element.childNodes.length; j++) {
                 var child = element.childNodes[j];
                 if (child.nodeType === Node.ELEMENT_NODE) {
-                    hasChildren = true;
                     childContent += '<div>' + self.formatHTMLElement(child, depth + 1) + '</div>';
                 } else if (child.nodeType === Node.TEXT_NODE && child.textContent.trim() !== '') {
-                    hasChildren = true;
                     childContent += '<div><span class="adl-value">' + self.escapeHTML(child.textContent.trim()) + '</span></div>';
                 }
             }
